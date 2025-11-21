@@ -14,6 +14,8 @@ import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.animation.*;
+import javafx.util.Duration;
 
 public class ClientGameController {
     
@@ -31,10 +33,11 @@ public class ClientGameController {
     public Client clientConnection;
     public PokerInfo clientPokerInfo;
     private ObservableList<String> logMessages;
-    private int roundCount = 0;
+    private static ObservableList<String> savedLogMessages = FXCollections.observableArrayList();
+    private static int roundCount = 0;
     private boolean isFirstLook = true;
     private boolean themeApplied = false;
-    
+
     @FXML
     public void initialize() {
         logMessages = FXCollections.observableArrayList();
@@ -69,9 +72,12 @@ public class ClientGameController {
         setCardImage(d1, "back");
         setCardImage(d2, "back");
         setCardImage(d3, "back");
-        
-        addLogMessage("Welcome to 3 Card Poker!");
-        addLogMessage("Place your bets to begin.");
+
+        // Only print the Welcome message to the Game Log on the very first round
+        if (roundCount == 0) {
+            addLogMessage("Welcome to 3 Card Poker!");
+            addLogMessage("Place your bets to begin.");
+        }
     }
     
     public void setClient(Client client) {
@@ -190,10 +196,18 @@ public class ClientGameController {
             // Update cash display (ante + pair plus deducted)
             cash.setText("$" + data.cash);
             
-            // Show player cards
+            /* Show player cards
             setCardImage(c1, data.card1);
             setCardImage(c2, data.card2);
             setCardImage(c3, data.card3);
+            */
+
+            // Flip player cards one by one into their actual values
+            // Small stagger for a "dealing" effect (0ms, 500ms, 1000ms)
+            playFlipAnimation(c1, data.card1, 0);
+            playFlipAnimation(c2, data.card2, 500);
+            playFlipAnimation(c3, data.card3, 1000);
+
             
             // Show dealer cards face down initially
             setCardImage(d1, "back");
@@ -212,10 +226,18 @@ public class ClientGameController {
             
         } else if (data.buttonPressed == 2 || data.buttonPressed == 3) { // Play or Fold response
             // Reveal dealer cards
+            /*
             setCardImage(d1, data.dCard1);
             setCardImage(d2, data.dCard2);
             setCardImage(d3, data.dCard3);
+             */
+
+            playFlipAnimation(d1, data.dCard1, 0);
+            playFlipAnimation(d2, data.dCard2, 500);
+            playFlipAnimation(d3, data.dCard3, 1000);
+
             dHandVal.setText(data.dHandVal);
+
             
             // Update final cash from server
             cash.setText("$" + data.cash);
@@ -358,6 +380,8 @@ public class ClientGameController {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("ClientEnd.fxml"));
             Parent root = loader.load();
+
+            savedLogMessages.setAll(logMessages);
             
             ClientEndController endController = loader.getController();
             endController.setGameController(this);
@@ -400,12 +424,39 @@ public class ClientGameController {
         setCardImage(d1, "back");
         setCardImage(d2, "back");
         setCardImage(d3, "back");
-        
+
+        logMessages.setAll(savedLogMessages);
+        listItems2.setItems(logMessages);
         addLogMessage("New round! Place your bets.");
     }
     
     public void updateCashDisplay(int cashAmount) {
         cash.setText("$" + cashAmount);
         addLogMessage("Starting with $" + cashAmount);
+    }
+
+    // Flip-card animation helper: shrinks card, swaps image, then expands.
+    private void playFlipAnimation(ImageView cardView, String finalCardString, double delayMillis) {
+        // Ensure we start from normal scale
+        cardView.setScaleX(1.0);
+
+        // Delay before animation starts
+        PauseTransition delay = new PauseTransition(Duration.millis(delayMillis));
+
+        // Shrink horizontally (simulate turning sideways)
+        ScaleTransition shrink = new ScaleTransition(Duration.millis(150), cardView);
+        shrink.setFromX(1);
+        shrink.setToX(0);
+
+        // After we are "edge-on", swap to the final card image
+        shrink.setOnFinished(e -> setCardImage(cardView, finalCardString));
+
+        // Expand back to full width (now showing the new image)
+        ScaleTransition expand = new ScaleTransition(Duration.millis(150), cardView);
+        expand.setFromX(0);
+        expand.setToX(1);
+
+        SequentialTransition seq = new SequentialTransition(delay, shrink, expand);
+        seq.play();
     }
 }
