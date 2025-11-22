@@ -9,8 +9,8 @@
 <?import javafx.scene.text.Text?>
 
 <VBox fx:id="gameRoot" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" 
-      fx:controller="ServerGameController" stylesheets="@server.css" styleClass="game-root"
-      prefWidth="1000" prefHeight="700">
+        fx:controller="ServerGameController" stylesheets="@server.css" styleClass="game-root"
+        prefWidth="1000" prefHeight="700">
     
     <HBox styleClass="title-box">
         <Text text="GAME MONITOR SERVER" styleClass="title"/>

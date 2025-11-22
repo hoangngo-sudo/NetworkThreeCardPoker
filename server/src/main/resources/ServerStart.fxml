@@ -1,19 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.text.Text?>
 
-<VBox prefHeight="700" prefWidth="1000" styleClass="start-root" stylesheets="@server.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ServerStartController">
+<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" 
+        fx:controller="ServerStartController" stylesheets="@server.css" styleClass="start-root" 
+        prefWidth="1000" prefHeight="700">
     
-    <Text styleClass="title" text="THREE CARD POKER SERVER" /> 
-    <Text styleClass="subtitle" text="Configure and Start Server" />
+    <Text text="THREE CARD POCKER SERVER" styleClass="title"/> 
+    <Text text="Configure and Start Server" styleClass="subtitle"/>
     
     <VBox styleClass="port-container">
         <HBox styleClass="config-box">
-            <TextField fx:id="portField" alignment="CENTER" promptText="Enter port (default: 5555)" styleClass="text-field" />
+            <TextField fx:id="portField" promptText="Enter port (default: 5555)" 
+                       alignment="CENTER" styleClass="text-field"/>
         </HBox>
-        <Button fx:id="startButton" onAction="#handleStartServer" styleClass="start-button" text="Start Server" />
+        <Button fx:id="startButton" text="Start Server" onAction="#handleStartServer" 
+                styleClass="start-button"/>
     </VBox>
     
 </VBox>
