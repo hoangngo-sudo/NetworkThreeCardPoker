@@ -12,7 +12,7 @@ public class PokerInfo implements Serializable {
     boolean playOver;
     boolean playerWon;
     boolean newRound;
-    int buttonPressed; // 1=deal, 2=play, 3=fold
+    int buttonPressed; // 1=deal, 2=play, 3=fold, 4=fresh start
     
     String card1;
     String card2;
@@ -28,7 +28,7 @@ public class PokerInfo implements Serializable {
     PokerInfo() {
         ante = 0;
         pairPlus = 0;
-        cash = 0;
+        cash = 200;
         play = 0;
         winningsThisRound = 0;
         hang = true;

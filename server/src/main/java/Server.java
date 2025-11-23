@@ -127,7 +127,7 @@ public class Server {
                 welcome.cash = 200; // Starting cash for each player
                 out.writeObject(welcome);
                 out.reset();
-                Server.this.logMessage("Client " + count + " sent initial welcome message with $200 starting cash");
+                Server.this.logMessage("Client " + count + " sent welcome message with $200 starting cash");
             } catch (Exception e) {
                 Server.this.logMessage("Streams not open for client " + count);
                 return;
@@ -144,6 +144,8 @@ public class Server {
                         handlePlay(data);
                     } else if (data.buttonPressed == 3) { // Fold button
                         handleFold(data);
+                    } else if (data.buttonPressed == 4) { // Fresh start
+                        handleFreshStart(data);
                     }
                     
                     out.writeObject(data);
@@ -198,8 +200,8 @@ public class Server {
             data.pHandVal = ThreeCardLogic.getHandDescription(playerHand);
             data.dHandVal = ThreeCardLogic.getHandDescription(dealerHand);
             
-            Server.this.logMessage("Client " + count + " has dealt: Ante=$" + data.ante + 
-                          ", PP=$" + data.pairPlus + ", Player: " + data.pHandVal);
+            Server.this.logMessage("Client " + count + " has dealt Ante = $" + data.ante + 
+                          ", Pair Plus = $" + data.pairPlus + ". Client " + count + " has " + data.pHandVal);
         }
         
         private void handlePlay(PokerInfo data) {
@@ -219,10 +221,10 @@ public class Server {
                 if (ppWinnings > 0) {
                     winnings += ppWinnings + player.getPairPlusBet(); // Return bet + winnings
                     netEarnings += ppWinnings; // Net profit from PP
-                    Server.this.logMessage("Client " + count + " won Pair Plus: $" + ppWinnings + " (total payout: $" + (ppWinnings + player.getPairPlusBet()) + ")");
+                    Server.this.logMessage("Client " + count + " won pair plus: $" + ppWinnings + " (total payout: $" + (ppWinnings + player.getPairPlusBet()) + ")");
                 } else {
                     netEarnings -= player.getPairPlusBet(); // Lost PP bet
-                    Server.this.logMessage("Client " + count + " lost Pair Plus bet: $" + player.getPairPlusBet());
+                    Server.this.logMessage("Client " + count + " lost pair plus bet: $" + player.getPairPlusBet());
                 }
             }
             
@@ -234,7 +236,7 @@ public class Server {
                 // Return both play wager and ante wager (pushed)
                 winnings += player.getAnteBet() + player.getPlayBet();
                 // netEarnings stays 0 for ante/play (push)
-                Server.this.logMessage("Client " + count + " dealer does not qualify. Ante ($" + player.getAnteBet() + ") and Play ($" + player.getPlayBet() + ") returned");
+                Server.this.logMessage("Client " + count + " dealer does not qualify. Ante ($" + player.getAnteBet() + ") and play ($" + player.getPlayBet() + ") returned");
                 data.winner = 0; // Indicate dealer didn't qualify
             } else {
                 // Compare hands
@@ -250,12 +252,12 @@ public class Server {
                 } else if (result == 2) { // Dealer wins
                     // Ante and play already deducted, no refund
                     netEarnings -= (player.getAnteBet() + player.getPlayBet()); // Lost both
-                    Server.this.logMessage("Client " + count + " dealer wins. Lost ante ($" + player.getAnteBet() + ") and play ($" + player.getPlayBet() + ")");
+                    Server.this.logMessage("Client " + count + " dealer wins. Client " + count + " lost ante ($" + player.getAnteBet() + ") and play ($" + player.getPlayBet() + ")");
                 } else { // Tie
                     // Return both bets
                     winnings += player.getAnteBet() + player.getPlayBet();
                     // netEarnings stays 0 (push)
-                    Server.this.logMessage("Client " + count + " tie game. Ante and Play returned");
+                    Server.this.logMessage("Client " + count + " has tie game. Ante and play returned");
                 }
             }
             
@@ -272,8 +274,24 @@ public class Server {
             data.cash = player.getTotalWinnings();
             data.winningsThisRound = 0; // No additional change
             
-            Server.this.logMessage("Client " + count + " folded. Lost ante ($" + player.getAnteBet() + 
+            Server.this.logMessage("Client " + count + " folded. Client " + count + "lost ante ($" + player.getAnteBet() + 
                                  ") and pair plus ($" + player.getPairPlusBet() + "). Total cash: $" + data.cash);
+        }
+        
+        private void handleFreshStart(PokerInfo data) {
+            // Reset player and dealer state
+            player = new Player();
+            dealer = new Dealer();
+            
+            // Send fresh welcome message with starting cash
+            data.buttonPressed = 0;
+            data.cash = 200;
+            data.ante = 0;
+            data.pairPlus = 0;
+            data.play = 0;
+            data.winningsThisRound = 0;
+            
+            Server.this.logMessage("Client " + count + " started fresh game with $200");
         }
     }
 }

@@ -51,7 +51,12 @@ public class ClientEndController {
     
     private void updateDisplay() {
         Platform.runLater(() -> {
-            if (pokerInfo.winningsThisRound > 0) {
+            if (pokerInfo.buttonPressed == 3) { // Folded
+                endScreenWinLoseText.setText("You Folded");
+                endScreenWinLoseText.setStyle("-fx-fill: #F44336;");
+                int lostAmount = pokerInfo.ante + pokerInfo.pairPlus;
+                endScreenWinLossMoney.setText("-$" + lostAmount);
+            } else if (pokerInfo.winningsThisRound > 0) {
                 // Positive net earnings - player won
                 endScreenWinLoseText.setText("YOU WON!");
                 endScreenWinLoseText.setStyle("-fx-fill: #4CAF50;");

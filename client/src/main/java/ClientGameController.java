@@ -37,6 +37,7 @@ public class ClientGameController {
     private static int roundCount = 0;
     private boolean isFirstLook = true;
     private boolean themeApplied = false;
+    private boolean animationInProgress = false;
 
     @FXML
     public void initialize() {
@@ -128,6 +129,13 @@ public class ClientGameController {
     
     @FXML
     private void handleConfirm() {
+        // Check if button is in "Continue" mode
+        if (confirmButton.getText().equals("Continue")) {
+            sendToEndScreen();
+            return;
+        }
+        
+        // Otherwise, handle bet confirmation
         try {
             int anteValue = Integer.parseInt(anteWagerField.getText().trim());
             int ppValue = ppWagerField.getText().trim().isEmpty() ? 
@@ -188,25 +196,21 @@ public class ClientGameController {
     private void handleServerResponse(PokerInfo data) {
         clientPokerInfo = data;
         
-        if (data.buttonPressed == 0) { // Initial welcome message
+        if (data.buttonPressed == 0) {
             cash.setText("$" + data.cash);
             clientPokerInfo.cash = data.cash;
-            addLogMessage("Starting with $" + data.cash);
         } else if (data.buttonPressed == 1) { // Response to deal
             // Update cash display (ante + pair plus deducted)
             cash.setText("$" + data.cash);
             
-            /* Show player cards
-            setCardImage(c1, data.card1);
-            setCardImage(c2, data.card2);
-            setCardImage(c3, data.card3);
-            */
-
+            animationInProgress = true;
+            
             // Flip player cards one by one into their actual values
             // Small stagger for a "dealing" effect (0ms, 500ms, 1000ms)
-            playFlipAnimation(c1, data.card1, 0);
-            playFlipAnimation(c2, data.card2, 500);
-            playFlipAnimation(c3, data.card3, 1000);
+            SequentialTransition playerCardsAnimation = new SequentialTransition();
+            playFlipAnimation(c1, data.card1, 0, playerCardsAnimation);
+            playFlipAnimation(c2, data.card2, 500, playerCardsAnimation);
+            playFlipAnimation(c3, data.card3, 1000, playerCardsAnimation);
 
             
             // Show dealer cards face down initially
@@ -217,24 +221,27 @@ public class ClientGameController {
             pHandVal.setText(data.pHandVal);
             dHandVal.setText("");
             
-            playButton.setDisable(false);
-            foldButton.setDisable(false);
+            // Enable buttons after animation completes (1500ms: 1000ms delay + 300ms for last card flip)
+            PauseTransition enableButtons = new PauseTransition(Duration.millis(1500));
+            enableButtons.setOnFinished(e -> {
+                playButton.setDisable(false);
+                foldButton.setDisable(false);
+                animationInProgress = false;
+            });
+            enableButtons.play();
             
-            addLogMessage("Ante ($" + clientPokerInfo.ante + ") and Pair Plus ($" + clientPokerInfo.pairPlus + ") deducted");
-            addLogMessage("Cards dealt! You have: " + data.pHandVal);
+            addLogMessage("Ante ($" + clientPokerInfo.ante + ") and pair plus ($" + clientPokerInfo.pairPlus + ") deducted");
+            addLogMessage("Cards dealt! You have " + data.pHandVal);
             addLogMessage("Play or Fold?");
             
         } else if (data.buttonPressed == 2 || data.buttonPressed == 3) { // Play or Fold response
+            animationInProgress = true;
+            
             // Reveal dealer cards
-            /*
-            setCardImage(d1, data.dCard1);
-            setCardImage(d2, data.dCard2);
-            setCardImage(d3, data.dCard3);
-             */
-
-            playFlipAnimation(d1, data.dCard1, 0);
-            playFlipAnimation(d2, data.dCard2, 500);
-            playFlipAnimation(d3, data.dCard3, 1000);
+            SequentialTransition dealerCardsAnimation = new SequentialTransition();
+            playFlipAnimation(d1, data.dCard1, 0, dealerCardsAnimation);
+            playFlipAnimation(d2, data.dCard2, 500, dealerCardsAnimation);
+            playFlipAnimation(d3, data.dCard3, 1000, dealerCardsAnimation);
 
             dHandVal.setText(data.dHandVal);
 
@@ -243,9 +250,9 @@ public class ClientGameController {
             cash.setText("$" + data.cash);
             
             if (data.buttonPressed == 3) { // Folded
-                addLogMessage("You folded. Lost: $" + (-data.winningsThisRound));
+                addLogMessage("You folded. Lost: $" + (data.ante + data.pairPlus));
             } else { // Played
-                addLogMessage("Dealer has: " + data.dHandVal);
+                addLogMessage("Dealer has " + data.dHandVal);
                 
                 if (data.winner == 0) {
                     addLogMessage("Dealer does not qualify, ante pushed!");
@@ -258,26 +265,26 @@ public class ClientGameController {
                 // Check Pair Plus result
                 if (clientPokerInfo.pairPlus > 0) {
                     if (data.winningsThisRound > 0) {
-                        addLogMessage("Pair Plus paid!");
+                        addLogMessage("Pair plus paid!");
                     } else {
-                        addLogMessage("No Pair Plus payout");
+                        addLogMessage("No pair plus payout");
                     }
                 }
             }
             
-            addLogMessage("Total winnings: $" + data.cash);
+            addLogMessage("Total cash: $" + data.cash);
+            addLogMessage("Click Continue to see results.");
             
             roundCount++;
             
-            // Add delay before transitioning to end screen so player can see dealer cards
-            new Thread(() -> {
-                try {
-                    Thread.sleep(7000);
-                    Platform.runLater(() -> sendToEndScreen());
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }).start();
+            // Enable Continue button after animation finishes (1500ms: 1000ms delay + 300ms for last card flip)
+            PauseTransition enableContinue = new PauseTransition(Duration.millis(1500));
+            enableContinue.setOnFinished(e -> {
+                confirmButton.setText("Continue");
+                confirmButton.setDisable(false);
+                animationInProgress = false;
+            });
+            enableContinue.play();
         }
     }
     
@@ -318,10 +325,23 @@ public class ClientGameController {
     
     @FXML
     private void handleFreshStart() {
+        // Prevent fresh start during animations
+        if (animationInProgress) {
+            addLogMessage("Please wait for animations to complete.");
+            return;
+        }
+        
+        // Send fresh start signal to server
+        PokerInfo freshStartSignal = new PokerInfo();
+        freshStartSignal.buttonPressed = 4; // Fresh start
+        clientConnection.send(freshStartSignal);
+        
         clientPokerInfo = new PokerInfo();
         roundCount = 0;
-        returnToGame();
+        savedLogMessages.clear();
+        returnToGame(false);
         addLogMessage("Fresh start! FUIYOHH Another one. Nicee");
+        addLogMessage("Place your bets to begin.");
     }
     
     @FXML
@@ -331,12 +351,12 @@ public class ClientGameController {
             gamePane.getStyleClass().remove("theme-green");
             gamePane.getStyleClass().add("theme-purple");
             setTextColor("white");
-            addLogMessage("Theme changed to Purple Royale!");
+            addLogMessage("Theme changed to purple color!");
         } else {
             gamePane.getStyleClass().remove("theme-purple");
             gamePane.getStyleClass().add("theme-green");
             setTextColor("white");
-            addLogMessage("Theme changed back to Classic Green!");
+            addLogMessage("Theme changed back to green color!");
         }
         isFirstLook = !isFirstLook;
     }
@@ -400,6 +420,10 @@ public class ClientGameController {
     }
     
     public void returnToGame() {
+        returnToGame(true);
+    }
+
+    public void returnToGame(boolean showMessage) {
         // Reset UI for new round
         ante.setText("$0");
         pp.setText("$0");
@@ -413,6 +437,7 @@ public class ClientGameController {
         anteWagerField.setDisable(false);
         ppWagerField.setDisable(false);
         
+        confirmButton.setText("Confirm Bets");
         confirmButton.setDisable(false);
         dealButton.setDisable(true);
         playButton.setDisable(true);
@@ -427,16 +452,17 @@ public class ClientGameController {
 
         logMessages.setAll(savedLogMessages);
         listItems2.setItems(logMessages);
-        addLogMessage("New round! Place your bets.");
+        if (showMessage) {
+            addLogMessage("New round! Place your bets.");
+        }
     }
     
     public void updateCashDisplay(int cashAmount) {
         cash.setText("$" + cashAmount);
-        addLogMessage("Starting with $" + cashAmount);
     }
 
     // Flip-card animation helper: shrinks card, swaps image, then expands.
-    private void playFlipAnimation(ImageView cardView, String finalCardString, double delayMillis) {
+    private void playFlipAnimation(ImageView cardView, String finalCardString, double delayMillis, SequentialTransition parent) {
         // Ensure we start from normal scale
         cardView.setScaleX(1.0);
 

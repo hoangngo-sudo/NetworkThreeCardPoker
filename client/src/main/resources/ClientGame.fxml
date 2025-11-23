@@ -23,7 +23,7 @@
     
     <!-- Main Game Area -->
     <center>
-        <VBox fx:id="gamePane" spacing="15" alignment="CENTER">
+        <VBox fx:id="gamePane" spacing="15" alignment="CENTER" styleClass="theme-green">
             <padding>
                 <Insets top="15" right="20" bottom="15" left="20"/>
             </padding>

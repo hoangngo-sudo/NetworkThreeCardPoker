@@ -11,16 +11,14 @@
         fx:controller="ServerStartController" stylesheets="@server.css" styleClass="start-root" 
         prefWidth="1000" prefHeight="700">
     
-    <Text text="THREE CARD POCKER SERVER" styleClass="title"/> 
-    <Text text="Configure and Start Server" styleClass="subtitle"/>
-    
-    <VBox styleClass="port-container">
-        <HBox styleClass="config-box">
-            <TextField fx:id="portField" promptText="Enter port (default: 5555)" 
-                       alignment="CENTER" styleClass="text-field"/>
+    <Text text="THREE CARD POKER SERVER"/> 
+    <VBox>
+        <Text text="Configure and Start Server"/>
+        <HBox>
+            <Text text="Port:"/>
+            <TextField fx:id="portField" promptText="5555"/>
         </HBox>
-        <Button fx:id="startButton" text="Start Server" onAction="#handleStartServer" 
-                styleClass="start-button"/>
+        <Button fx:id="startButton" text="Start Server" onAction="#handleStartServer"/>
     </VBox>
     
 </VBox>

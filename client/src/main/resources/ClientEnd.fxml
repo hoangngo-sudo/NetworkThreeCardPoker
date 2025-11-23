@@ -9,7 +9,7 @@
       fx:controller="ClientEndController" stylesheets="@client.css" styleClass="end-root"
       prefWidth="1000" prefHeight="700">
     <Text text="Round Complete!"/>
-    <Text fx:id="endScreenWinLoseText" text=""/>
+    <Text fx:id="endScreenWinLoseText" text="" styleClass="result-title"/>
     <VBox>
         <Text text="Round Earnings:"/>
         <Text fx:id="endScreenWinLossMoney" text="0"/>

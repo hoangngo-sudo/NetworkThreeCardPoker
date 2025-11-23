@@ -9,6 +9,10 @@
     -fx-background-color: #f0f0f0;
 }
 
+.theme-green Text, .theme-purple Text {
+    -fx-fill: white;
+}
+
 .end-root {
     -fx-background-color: #f0f0f0;
     -fx-alignment: center;
@@ -55,6 +59,10 @@
 .end-root .return-button,
 .end-root .exit-button {
     -fx-pref-width: 280px;
+}
+
+.result-title {
+    -fx-font-size: 24px;
 }
 
 
