@@ -350,16 +350,35 @@ public class ClientGameController {
         themeApplied = true;
         if (isFirstLook) {
             gamePane.getStyleClass().remove("theme-green");
-            gamePane.getStyleClass().add("theme-purple");
+            gamePane.getStyleClass().add("theme-maroon");
             setTextColor("white");
-            addLogMessage("Theme changed to purple color!");
+            addLogMessage("Theme changed to maroon color!");
         } else {
-            gamePane.getStyleClass().remove("theme-purple");
+            gamePane.getStyleClass().remove("theme-maroon");
             gamePane.getStyleClass().add("theme-green");
             setTextColor("white");
             addLogMessage("Theme changed back to green color!");
         }
         isFirstLook = !isFirstLook;
+    }
+
+    @FXML
+    private void showOddsWindow() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("ClientPayouts.fxml"));
+            Parent root = loader.load();
+
+            Stage stage = new Stage();
+            Scene scene = new Scene(root);
+            scene.getStylesheets().add(getClass().getResource("clientPayouts.css").toExternalForm());
+
+            stage.setTitle("Three Card Poker Payouts");
+            stage.setScene(scene);
+            stage.show();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
     
     private void setTextColor(String color) {
@@ -388,10 +407,10 @@ public class ClientGameController {
 
         if (!isFirstLook) {
             gamePane.getStyleClass().remove("theme-green");
-            gamePane.getStyleClass().add("theme-purple");
+            gamePane.getStyleClass().add("theme-maroon");
             setTextColor("white");
         } else {
-            gamePane.getStyleClass().remove("theme-purple");
+            gamePane.getStyleClass().remove("theme-maroon");
             gamePane.getStyleClass().add("theme-green");
             setTextColor("white");
         }
