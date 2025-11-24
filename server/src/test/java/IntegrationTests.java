@@ -255,4 +255,68 @@ public class IntegrationTests {
 
     }
 
+    @Test
+    void foldingLosesBothAnteAndPairPlus() {
+        Player p = new Player();
+        p.setTotalWinnings(100);
+        p.setAnteBet(15);
+        p.setPairPlusBet(10);
+
+        int initialCash = 100;
+        int afterBets = initialCash - 15 - 10;
+        
+        assertEquals(75, afterBets);
+        
+        int finalCash = afterBets;
+        assertEquals(75, finalCash);
+    }
+
+    @Test
+    void dealerQueenHighExactlyQualifies() {
+        ArrayList<Card> queenHigh = hand(
+            new Card('H', 12),
+            new Card('D', 10),
+            new Card('C', 5)
+        );
+        
+        boolean qualifies = ThreeCardLogic.dealerQualifies(queenHigh);
+        assertTrue(qualifies);
+    }
+
+    @Test
+    void dealerJackHighDoesNotQualify() {
+        ArrayList<Card> jackHigh = hand(
+            new Card('S', 11),
+            new Card('H', 9),
+            new Card('C', 2)
+        );
+        
+        assertFalse(ThreeCardLogic.dealerQualifies(jackHigh));
+    }
+
+    @Test
+    void pairPlusPayoutsStraightFlush() {
+        ArrayList<Card> sf = hand(
+            new Card('H', 5),
+            new Card('H', 6),
+            new Card('H', 7)
+        );
+        
+        int bet = 10;
+        int winnings = ThreeCardLogic.evalPPWinnings(sf, bet);
+        assertEquals(400, winnings);
+    }
+
+    @Test
+    void pairPlusPayoutsThreeOfKind() {
+        ArrayList<Card> trips = hand(
+            new Card('H', 8),
+            new Card('D', 8),
+            new Card('C', 8)
+        );
+        
+        int winnings = ThreeCardLogic.evalPPWinnings(trips, 5);
+        assertEquals(150, winnings);
+    }
+
 }

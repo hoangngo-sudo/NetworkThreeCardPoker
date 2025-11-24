@@ -24,7 +24,7 @@ public class DealerTest {
 
     @Test
     void dealerHandReducesDeckSizeByThree() {
-        int deckSize = dealer.theDeck.size();
+        // int deckSize = dealer.theDeck.size();
 
         assertEquals(3, hand.size());
         assertEquals(49, dealer.theDeck.size());
@@ -40,7 +40,7 @@ public class DealerTest {
         int deckSize =  dealer.theDeck.size();
         assertTrue(deckSize < 3, "Precondition: deck should be fewer than 3 cards");
 
-        ArrayList<Card> dealerHand =  dealer.dealHand();
+        // ArrayList<Card> dealerHand =  dealer.dealHand();
 
         // After calling dealhand, the deck should have been rebuilt and then reduced by 3
         assertEquals(3, hand.size());

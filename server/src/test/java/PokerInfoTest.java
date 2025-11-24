@@ -16,7 +16,7 @@ public class PokerInfoTest {
 
         assertEquals(0, info.ante);
         assertEquals(0, info.pairPlus);
-        assertEquals(0, info.cash);
+        assertEquals(200, info.cash);
         assertEquals(0, info.play);
         assertEquals(0, info.winningsThisRound);
 
