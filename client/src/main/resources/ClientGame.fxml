@@ -16,6 +16,7 @@
             <Menu text="Options">
                 <MenuItem text="Fresh Start" onAction="#handleFreshStart"/>
                 <MenuItem text="New Look" onAction="#handleNewLook"/>
+                <MenuItem text="Payouts" onAction="#handleShowPayouts"/>
                 <MenuItem text="Exit" onAction="#handleExit"/>
             </Menu>
         </MenuBar>

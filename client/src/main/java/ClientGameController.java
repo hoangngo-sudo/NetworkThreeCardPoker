@@ -317,6 +317,26 @@ public class ClientGameController {
         foldButton.setDisable(true);
         addLogMessage("You folded.");
     }
+
+    @FXML
+    private void handleShowPayouts() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("ClientPayout.fxml"));
+            Parent root = loader.load();
+
+            Scene scene = new Scene(root);
+            scene.getStylesheets().add(getClass().getResource("client.css").toExternalForm());
+
+            Stage stage = new Stage();
+            stage.setTitle("Payouts");
+            stage.setScene(scene);
+            stage.initOwner(dealButton.getScene().getWindow());
+            stage.setResizable(false);
+            stage.show();
+        } catch (Exception e) {
+            addLogMessage("Could not open payouts window.");
+        }
+    }
     
     @FXML
     private void handleExit() {
@@ -350,11 +370,11 @@ public class ClientGameController {
         themeApplied = true;
         if (isFirstLook) {
             gamePane.getStyleClass().remove("theme-green");
-            gamePane.getStyleClass().add("theme-purple");
+            gamePane.getStyleClass().add("theme-maroon");
             setTextColor("white");
-            addLogMessage("Theme changed to purple color!");
+            addLogMessage("Theme changed to maroon color!");
         } else {
-            gamePane.getStyleClass().remove("theme-purple");
+            gamePane.getStyleClass().remove("theme-maroon");
             gamePane.getStyleClass().add("theme-green");
             setTextColor("white");
             addLogMessage("Theme changed back to green color!");
@@ -388,10 +408,10 @@ public class ClientGameController {
 
         if (!isFirstLook) {
             gamePane.getStyleClass().remove("theme-green");
-            gamePane.getStyleClass().add("theme-purple");
+            gamePane.getStyleClass().add("theme-maroon");
             setTextColor("white");
         } else {
-            gamePane.getStyleClass().remove("theme-purple");
+            gamePane.getStyleClass().remove("theme-maroon");
             gamePane.getStyleClass().add("theme-green");
             setTextColor("white");
         }

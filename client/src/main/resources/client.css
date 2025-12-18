@@ -52,8 +52,8 @@
     -fx-background-color: linear-gradient(to bottom, #0d5c2f, #0a4523);
 }
 
-.theme-purple {
-    -fx-background-color: linear-gradient(to bottom, #2c0d54, #1a0833);
+.theme-maroon {
+    -fx-background-color: linear-gradient(to bottom, #5a0f0f, #3b0808);
 }
 
 .end-root .return-button,
@@ -63,6 +63,34 @@
 
 .result-title {
     -fx-font-size: 24px;
+}
+
+
+.odds-window {
+    -fx-background-color: #0d1b2a;
+}
+
+.odds-window .label {
+    -fx-text-fill: #e5e7eb;
+}
+
+
+.odds-title {
+    -fx-font-size: 26px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #f9fafb;
+}
+
+
+.odds-section-title {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #cbd5e1;
+}
+
+
+.odds-entry {
+    -fx-font-size: 14px;
 }
 
 
